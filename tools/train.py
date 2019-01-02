@@ -151,7 +151,7 @@ def main(args):
             iter_loss += float(loss)
 
         loss_meter.add(iter_loss)
-
+        logger.info("Current iter:{}/{},cumulative gradient and ce_loss:{},learning rate:{}.".format(iteration,CONFIG.ITER_MAX,loss_meter.value()[0],optimizer.param_groups[0]["lr"]))
         # Update weights with accumulated gradients
         optimizer.step()
 
@@ -178,6 +178,7 @@ def main(args):
 
         # Save a model (short term)
         if iteration % 100 == 0:
+            logger.info("save checkpoint every 100 iters.")
             torch.save(
                 model.module.state_dict(),
                 osp.join(args.checkpoint_dir, "checkpoint_current.pth"),
