@@ -1,5 +1,5 @@
 DATASET: cocostuff10k
-ROOT: /media/kazuto1011/Extra/cocostuff/cocostuff-10k-v1.1
+ROOT: /home/rjw/desktop/maskrcnn/deeplab-pytorch/data/datasets/cocostuff
 LABELS: ./data/datasets/cocostuff/labels_2.txt
 IGNORE_LABEL: -1
 
@@ -24,8 +24,8 @@ PYRAMIDS: [6, 12, 18, 24]
 
 # Training setting
 BATCH_SIZE:
-    TRAIN: 5
-    TEST: 5
+    TRAIN: 4
+    TEST: 2
 ITER_MAX: 20000
 ITER_SIZE: 2
 ITER_SAVE: 5000

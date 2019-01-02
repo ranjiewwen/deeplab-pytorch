@@ -11,8 +11,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .resnet import _ConvBatchNormReLU, _ResBlock
 
+from .resnet import _ConvBatchNormReLU, _ResBlock
 
 class _ASPPModule(nn.Module):
     """Atrous Spatial Pyramid Pooling"""

@@ -28,14 +28,8 @@ from libs.metric.metric import scores
 def dense_crf_wrapper(args):
     return dense_crf(args[0], args[1])
 
-
-@click.command()
-@click.option("-c", "--config", type=str, required=True)
-@click.option("-m", "--model-path", type=str, required=True)
-@click.option("--cuda/--no-cuda", default=True)
-@click.option("--crf", is_flag=True)
-def main(config, model_path, cuda, crf):
-    cuda = cuda and torch.cuda.is_available()
+def main(args):
+    cuda = args.use_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if cuda else "cpu")
 
     if cuda:
@@ -45,7 +39,7 @@ def main(config, model_path, cuda, crf):
         print("Running on CPU")
 
     # Configuration
-    CONFIG = Dict(yaml.load(open(config)))
+    CONFIG = Dict(yaml.load(open(args.config)))
 
     # Dataset 10k or 164k
     dataset = get_dataset(CONFIG.DATASET)(
@@ -70,7 +64,7 @@ def main(config, model_path, cuda, crf):
 
     # Model
     model = DeepLabV2_ResNet101_MSC(n_classes=CONFIG.N_CLASSES)
-    state_dict = torch.load(model_path, map_location=lambda storage, loc: storage)
+    state_dict = torch.load(args.model_path, map_location=lambda storage, loc: storage)
     model.load_state_dict(state_dict)
     model = nn.DataParallel(model)
     model.eval()
@@ -92,7 +86,7 @@ def main(config, model_path, cuda, crf):
         probs = probs.data.cpu().numpy()
 
         # Postprocessing
-        if crf:
+        if args.use_crf:
             pool = mp.Pool(mp.cpu_count())
             images = images.data.cpu().numpy().astype(np.uint8).transpose(0, 2, 3, 1)
             probs = pool.map(dense_crf_wrapper, zip(images, probs))
@@ -103,9 +97,18 @@ def main(config, model_path, cuda, crf):
 
     score = scores(gts, preds, n_class=CONFIG.N_CLASSES)
 
-    with open(model_path.replace(".pth", ".json"), "w") as f:
+    with open(args.model_path.replace(".pth", ".json"), "w") as f:
         json.dump(score, f, indent=4, sort_keys=True)
 
 
+import argparse
 if __name__ == "__main__":
-    main()
+    
+    parser = argparse.ArgumentParser(description="Pytorch implement deeplab eval for image semantic segmetation.")
+    parser.add_argument("--config",default="",metavar="FILE",help="path to config file",type=str)
+    parser.add_argument("--model-path",default="",type=str,help="model path,use the model to eval")
+    parser.add_argument("--use_cuda",dest="use_cuda",help="use cuda for accelerate",action="use_true",default=True)
+    parser.add_argument("--use_crf",dest="use_crf",action="use_crf",help="use crf to postprocess",default=True)
+    args=parser.parse_args()
+
+    main(args)

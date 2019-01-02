@@ -99,14 +99,15 @@ ENV/
 
 # mypy
 .mypy_cache/
-
+*.idea
 *.vscode
 *.pth
 *.pth.tar
-runs/
-.DS_Store
-exps/
-_*
+*.caffemodel
+experiments/runs/
+data/datasets/cocostuff/annotations
+data/datasets/cocostuff/imageLists
+data/datasets/cocostuff/images
 *.pdf
 *.gv
 .style.yapf

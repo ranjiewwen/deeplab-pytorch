@@ -4,17 +4,16 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - pytorch
-  - torchvision
-  # - cuda92
+  # - pytorch=0.4.1
+  # - torchvision=0.2.1
   - h5py
   - scipy
   - matplotlib
   - pyyaml
   - click
   - tqdm
-  # - clang
-  # - clangxx
+  - clang
+  - clangxx
   - pydensecrf
   - pip:
     - torchnet==0.0.2

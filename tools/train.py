@@ -27,11 +27,8 @@ from libs.loss.ce_loss import CrossEntropyLoss2d
 from libs.solver.lr_scheduler import get_params,poly_lr_scheduler
 
 
-@click.command()
-@click.option("-c", "--config", type=str, required=True)
-@click.option("--cuda/--no-cuda", default=True)
-def main(config, cuda):
-    cuda = cuda and torch.cuda.is_available()
+def main(args):
+    cuda = args.use_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if cuda else "cpu")
 
     if cuda:
@@ -41,7 +38,7 @@ def main(config, cuda):
         print("Running on CPU")
 
     # Configuration
-    CONFIG = Dict(yaml.load(open(config)))
+    CONFIG = Dict(yaml.load(open(args.config)))
 
     # Dataset 10k or 164k
     dataset = get_dataset(CONFIG.DATASET)(
@@ -192,5 +189,13 @@ def main(config, cuda):
     )
 
 
+import argparse
+
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description="Pytorch implement deeplab train for image semantic segmetation.")
+    parser.add_argument("--config",default="",metavar="FILE",help="path to config file",type=str)
+    parser.add_argument("--use_cuda",dest="use_cuda",help="use cuda for accelerate",action="use_true",default=True)
+    args=parser.parse_args()
+
+    main(args)
