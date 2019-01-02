@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 #
-# Author:   Kazuto Nakashima
-# URL:      http://kazuto1011.github.io
-# Created:  2017-11-03
+# Author:   ranjiewen
+# URL:      
+# Created:  2019-01-01
 
 from __future__ import absolute_import, division, print_function
 
@@ -21,7 +21,8 @@ from tqdm import tqdm
 
 from libs.datasets import get_dataset
 from libs.models import DeepLabV2_ResNet101_MSC
-from libs.utils import dense_crf, scores
+from libs.utils import dense_crf
+from libs.metric.metric import scores
 
 
 def dense_crf_wrapper(args):

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 #
-# Author:   Kazuto Nakashima
-# URL:      http://kazuto1011.github.io
-# Created:  2017-11-01
+# Author:   ranjiewen
+# URL:      
+# Created:  2019-01-01
 
 from __future__ import absolute_import, division, print_function
 
@@ -23,38 +23,8 @@ from tqdm import tqdm
 
 from libs.datasets import get_dataset
 from libs.models import DeepLabV2_ResNet101_MSC
-from libs.utils.loss import CrossEntropyLoss2d
-
-
-def get_params(model, key):
-    # For Dilated FCN
-    if key == "1x":
-        for m in model.named_modules():
-            if "layer" in m[0]:
-                if isinstance(m[1], nn.Conv2d):
-                    for p in m[1].parameters():
-                        yield p
-    # For conv weight in the ASPP module
-    if key == "10x":
-        for m in model.named_modules():
-            if "aspp" in m[0]:
-                if isinstance(m[1], nn.Conv2d):
-                    yield m[1].weight
-    # For conv bias in the ASPP module
-    if key == "20x":
-        for m in model.named_modules():
-            if "aspp" in m[0]:
-                if isinstance(m[1], nn.Conv2d):
-                    yield m[1].bias
-
-
-def poly_lr_scheduler(optimizer, init_lr, iter, lr_decay_iter, max_iter, power):
-    if iter % lr_decay_iter or iter > max_iter:
-        return None
-    new_lr = init_lr * (1 - float(iter) / max_iter) ** power
-    optimizer.param_groups[0]["lr"] = new_lr
-    optimizer.param_groups[1]["lr"] = 10 * new_lr
-    optimizer.param_groups[2]["lr"] = 20 * new_lr
+from libs.loss.ce_loss import CrossEntropyLoss2d
+from libs.solver.lr_scheduler import get_params,poly_lr_scheduler
 
 
 @click.command()
