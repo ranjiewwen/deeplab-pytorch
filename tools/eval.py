@@ -9,8 +9,6 @@ from __future__ import absolute_import, division, print_function
 
 import json
 import multiprocessing as mp
-
-import click
 import numpy as np
 import torch
 import torch.nn as nn

@@ -8,18 +8,16 @@
 from __future__ import absolute_import, division, print_function
 
 import os.path as osp
-
-import click
-import cv2
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 import yaml
 from addict import Dict
 from tensorboardX import SummaryWriter
 from torchnet.meter import MovingAverageValueMeter
 from tqdm import tqdm
+from utils.logger import setup_logger
 
 from libs.datasets import get_dataset
 from libs.models import DeepLabV2_ResNet101_MSC
@@ -62,8 +60,9 @@ def main(args):
     loader_iter = iter(loader)
 
     # Model
+    # optimize should load chekpoint
     model = DeepLabV2_ResNet101_MSC(n_classes=CONFIG.N_CLASSES)
-    state_dict = torch.load(CONFIG.INIT_MODEL)
+    state_dict = torch.load(args.init_model_path)
     model.load_state_dict(state_dict, strict=False)  # Skip "aspp" layer
     model = nn.DataParallel(model)
     model.to(device)
@@ -96,7 +95,7 @@ def main(args):
     criterion.to(device)
 
     # TensorBoard Logger
-    writer = SummaryWriter(CONFIG.LOG_DIR)
+    writer = SummaryWriter(args.tesorboard_logs_dir) # if the filefolder is same or not
     loss_meter = MovingAverageValueMeter(20)
 
     model.train()
@@ -174,28 +173,50 @@ def main(args):
         if iteration % CONFIG.ITER_SAVE == 0:
             torch.save(
                 model.module.state_dict(),
-                osp.join(CONFIG.SAVE_DIR, "checkpoint_{}.pth".format(iteration)),
+                osp.join(args.checkpoint_dir, "checkpoint_{}.pth".format(iteration)),
             )
 
         # Save a model (short term)
         if iteration % 100 == 0:
             torch.save(
                 model.module.state_dict(),
-                osp.join(CONFIG.SAVE_DIR, "checkpoint_current.pth"),
+                osp.join(args.checkpoint_dir, "checkpoint_current.pth"),
             )
 
     torch.save(
-        model.module.state_dict(), osp.join(CONFIG.SAVE_DIR, "checkpoint_final.pth")
+        model.module.state_dict(), osp.join(args.checkpoint_dir, "checkpoint_final.pth")
     )
 
 
 import argparse
+from datetime import datetime
+import time
+import os
+
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Pytorch implement deeplab train for image semantic segmetation.")
+    parser.add_argument("--exp_name",type=str,default="deeplab_",help="experiments name")
     parser.add_argument("--config",default="",metavar="FILE",help="path to config file",type=str)
-    parser.add_argument("--use_cuda",dest="use_cuda",help="use cuda for accelerate",action="use_true",default=True)
+    parser.add_argument("--use_cuda",dest="use_cuda",help="use cuda for accelerate",action="store_true",default=True)
+
+    # realted path parameter
+    parser.add_argument("--init_model_path",type=str,default=os.path.abspath('..')+"/data/models/deeplab_resnet101/coco_init/deeplabv2_resnet101_COCO_init.pth")
+    parser.add_argument("--checkpoint_dir",type=str,default=os.path.abspath('..')+"/data/models/deeplab_resnet101/cocostuff10k")
+    parser.add_argument("--tesorboard_logs_dir",type=str,default=os.path.abspath('..')+"/experiments/runs/cocostuff10k")
+
     args=parser.parse_args()
+
+    timestamp = datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%H:%M')
+    args.exp_name = args.exp_name + timestamp
+    log_path= os.path.abspath('..')+'/experiments/'+ str(args.exp_name)
+    if not os.path.isdir(log_path):
+        os.makedirs(log_path)
+    output_dir=log_path
+    if args.config is None:
+        print("please add congfig parameter !")
+    logger = setup_logger("deeplab_", output_dir)
+    logger.info(args)
 
     main(args)

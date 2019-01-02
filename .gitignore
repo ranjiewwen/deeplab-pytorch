@@ -105,6 +105,7 @@ ENV/
 *.pth.tar
 *.caffemodel
 experiments/runs/
+experiments/deeplab*
 data/datasets/cocostuff/annotations
 data/datasets/cocostuff/imageLists
 data/datasets/cocostuff/images

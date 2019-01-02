@@ -1,14 +1,19 @@
 # DeepLab with PyTorch
 
-PyTorch implementation to train **DeepLab v2** model (ResNet backbone) on **COCO-Stuff** dataset.
-DeepLab is one of the CNN architectures for semantic image segmentation.
-COCO-Stuff is a semantic segmentation dataset, which includes 164k images annotated with 171 thing/stuff classes (+ unlabeled).
-This repository aims to reproduce the official score of DeepLab v2 on COCO-Stuff datasets.
-The model can be trained both on [COCO-Stuff 164k](https://github.com/nightrome/cocostuff) and the outdated [COCO-Stuff 10k](https://github.com/nightrome/cocostuff10k), without building the official DeepLab v2 implemented by Caffe.
-Trained models are provided [here](#pre-trained-models).
-ResNet-based DeepLab v3/v3+ are also included, although they are not tested.
+- PyTorch implementation to train **DeepLab v2** model (ResNet backbone) on **COCO-Stuff** dataset.
+
+- COCO-Stuff is a semantic segmentation dataset, which includes 164k images annotated with 171 thing/stuff classes (+ unlabeled).
+
+- This repository aims to reproduce the official score of DeepLab v2 on COCO-Stuff datasets.
+
+- The model can be trained both on [COCO-Stuff 164k](https://github.com/nightrome/cocostuff) and the outdated [COCO-Stuff 10k](https://github.com/nightrome/cocostuff10k), without building the official DeepLab v2 implemented by Caffe.
+
+- ResNet-based DeepLab v3/v3+ are also included, although they are not tested.
 
 ### File tree
+
+- Refactored file structure is easy to expand. and optimize code style,convenient secondary development.
+- You can add config,data,loss,metric,model file in corresponding folder.
 
 ```bash
 ├── config
@@ -81,35 +86,36 @@ ResNet-based DeepLab v3/v3+ are also included, although they are not tested.
 
 - About the requirements,datasets, you can find in original [deeplab-pytorch project](https://github.com/kazuto1011/deeplab-pytorch)
 
-
-### Initial parameters
-
-1. Run the script below to download caffemodel pre-trained on MSCOCO (1GB+).
-
-```sh
-./scripts/setup_caffemodels.sh
-```
-
-2. Convert the caffemodel to pytorch compatible. No need to build the official DeepLab!
-
-```sh
-# This generates deeplabv2_resnet101_COCO_init.pth
-python convert.py --dataset coco_init
-```
-You can also convert an included ```train2_iter_20000.caffemodel``` for PASCAL VOC 2012 dataset. See [here](config/README.md#voc12yaml).
-
 ## Training
 
 Training, evaluation, and some demos are all through the [```.yaml``` configuration files](config/README.md).
 
 ```sh
 # Train DeepLab v2 on COCO-Stuff 164k
-python train.py --config config/cocostuff164k.yaml
+python tools/train.py --config config/cocostuff10k.yaml
 ```
 
 ```sh
 # Monitor a cross-entropy loss
 tensorboard --logdir runs
+```
+
+## Demo
+
+### From an image
+
+```bash
+python demo/demo.py --config config/cocostuff164k.yaml \
+               --model-path <PATH TO MODEL> \
+               --image-path <PATH TO IMAGE>
+```
+
+### From a web camera
+
+```bash
+python demo/livedemo.py --config config/cocostuff164k.yaml \
+                   --model-path <PATH TO MODEL> \
+                   --camera-id <CAMERA ID>
 ```
 
 ## Performance
@@ -123,31 +129,12 @@ tensorboard --logdir runs
 |[**Official (Caffe)**](https://github.com/nightrome/cocostuff10k)|**10k train**|**10k val**|**No**|**65.1%**|**45.5%**|**34.4%**|**50.4%**|
 |**This repo**|**10k train**|**10k val**|**No**|**65.3%**|**45.3%**|**34.4%**|**50.5%**|
 |This repo|10k train|10k val|Yes|66.7%|45.9%|35.5%|51.9%|
-|This repo|164k train|10k val|No|67.6%|54.9%|43.2%|53.9%|
-|This repo|164k train|10k val|Yes|68.7%|55.3%|44.4%|55.1%|
-|This repo|164k train|164k val|No|65.7%|49.7%|37.6%|50.0%|
-|This repo|164k train|164k val|Yes|66.8%|50.1%|38.5%|51.1%|
 
 </small>
 
+## Coming soon optimization
 
-## Demo
-
-### From an image
-
-```bash
-python tools/demo.py --config config/cocostuff164k.yaml \
-               --model-path <PATH TO MODEL> \
-               --image-path <PATH TO IMAGE>
-```
-
-### From a web camera
-
-```bash
-python tools/livedemo.py --config config/cocostuff164k.yaml \
-                   --model-path <PATH TO MODEL> \
-                   --camera-id <CAMERA ID>
-```
+- add voc and cityscapes datasets for semantic segmetation .
 
 ## References
 
