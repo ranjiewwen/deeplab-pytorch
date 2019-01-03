@@ -10,7 +10,18 @@
 
 - ResNet-based DeepLab v3/v3+ are also included, although they are not tested.
 
-### File tree
+## Setup
+
+- Get the code :
+
+```
+git clone https://github.com/ranjiewwen/deeplab-pytorch
+cd deeplab-pytorch
+git checkout rjw
+```
+- About the requirements,datasets, you can find in original [deeplab-pytorch project](https://github.com/kazuto1011/deeplab-pytorch)
+
+## File tree
 
 - Refactored file structure is easy to expand. and optimize code style,convenient secondary development.
 - You can add config,data,loss,metric,model file in corresponding folder.
@@ -82,9 +93,6 @@
     └── hubconf.py
 
 ```
-## Setup
-
-- About the requirements,datasets, you can find in original [deeplab-pytorch project](https://github.com/kazuto1011/deeplab-pytorch)
 
 ## Training
 
